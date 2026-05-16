@@ -1,0 +1,47 @@
+{
+  "_comment": "Copy this file to kb.config.json and customize for your project. kb.config.json is gitignored.",
+  "name": "my-x-revamp",
+  "handle": "your-handle-without-@",
+  "version": 1,
+  "tier1_amplification": [
+    "_comment: top accounts you amplify whose conversation you want to be in",
+    "garrytan",
+    "charles_irl",
+    "CloudflareDev"
+  ],
+  "north_stars": [
+    "_comment: 1-4 concentric audiences your posts must serve",
+    "personal brand",
+    "job opportunities",
+    "client lead-gen",
+    "builder ecosystem"
+  ],
+  "sources": {
+    "include": ["**/*.md", "**/*.json"],
+    "exclude": ["node_modules/**", "dist/**", ".git/**", "kb/**"]
+  },
+  "compile": {
+    "concept_threshold": 2,
+    "max_context_tokens": 200000,
+    "incremental": true,
+    "batch_size": 10
+  },
+  "provenance": {
+    "required": true,
+    "method": "chunk",
+    "chunk_strategy": "tweet"
+  },
+  "output_dir": "kb/output",
+  "watch": {
+    "paths": ["kb/raw"],
+    "debounce_ms": 500,
+    "auto_compile": false,
+    "auto_commit": false
+  },
+  "candidates": { "overflow_threshold": 20 },
+  "confidence": {
+    "weights": { "sources": 0.25, "quality": 0.25, "recency": 0.25, "crossrefs": 0.25 },
+    "decay_tau_days": { "code": 90, "concept": 365, "news": 30, "default": 180 }
+  },
+  "lifecycle": { "stale_after_days": 90, "drift_action": "demote" }
+}

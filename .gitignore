@@ -1,0 +1,21 @@
+# Personal data — never commit
+naledicodes-feed.html
+tweet-ids.json
+tweets.json
+kb.config.json
+kb.config.local.json
+kb/raw/
+kb/wiki/sources/
+kb/wiki/concepts/
+kb/wiki/index.md
+kb/output/
+kb/.kb-manifest.json
+
+# Claude Code per-project state
+.claude/
+
+# Python / OS
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
