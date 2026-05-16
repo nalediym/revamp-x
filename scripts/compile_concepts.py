@@ -52,15 +52,51 @@ def m_thread_continuation(t): return t['user'] == HANDLE and t.get('parent_id')
 def m_consumption_gap(t): return False
 
 TOPIC_MATCHERS = [
-    ('quantum-computing-arc', r'\b(quantum|qubit|qiskit|superposition|entanglement)\b'),
-    ('cybersecurity-arc', r'\b(cissp|cybersecurity|hardwarekey|encryption|cryptograph|infosec|owasp|stride)\b'),
-    ('nand2tetris-arc', r'\bnand'),
-    ('advent-of-code-arc', r'(advent of code|adventofcode|day \d+|#aoc)'),
-    ('sre-infra-arc', r'\b(SRE|site reliability|prodcast|incident response|observability|reliability engineering)\b'),
-    ('cloudflare-arc', r'\bcloudflare\b'),
-    ('ai-retrieval-rag-arc', r'\b(RAG|ColPali|GraphRAG|MemGPT|vector search|retrieval|embedding|hybrid retrieval|llm|context window|agent memory)\b'),
-    ('python-data-arc', r'\b(python|pandas|numpy|jupyter|datacamp|data science)\b'),
+    # Rebuilt 2026-05-16 based on Gemini's independent second-opinion analysis.
+    # Previous matcher set covered only 25% of the corpus and missed the active builder arcs.
+    # See kb/output/gemini-second-opinion-2026-05-16.md for the rationale per arc.
+
+    # LIVE arcs (posts in last 30 days)
+    ('ai-agents-mcp-arc',
+     r'\b(MCP|model context protocol|claude code|cursor|opencode|hermes|openclaw|aider|copilot|tweet-for-me|skillify|agent infra|agent loop|sub-?agent|agentic|llm.?agent|multi-?agent)\b'),
+    ('career-productivity-psychology-arc',
+     r'\b(productivity|feedback|career|recruiter|hiring|portfolio|workflow|getthingsdone|productivityhack|golden.?nugget|leadership|management|standup|step.by.step|how i (work|build|ship))\b'),
+    ('ai-generative-art-arc',
+     r'\b(stable diffusion|flux|krea|midjourney|dall.?e|comfy|diffusion model|image gen|video gen|seeddance|veo|generative (art|model|video|image))\b'),
+    ('ai-retrieval-rag-arc',
+     r'\b(RAG|ColPali|GraphRAG|MemGPT|Zep|vector search|retrieval|embedding|hybrid retrieval|context window|agent memory|context engineering)\b'),
+    ('nyc-tech-scene-arc',
+     r'\b(pubkey|startup grind|HRF|hackathon|meetup|i.?m attending|i am going to|nyc|new york|brooklyn)\b'),
+    ('sre-infra-cloudflare-arc',
+     r'\b(SRE|site reliability|prodcast|observability|reliability engineering|cloudflare|wrangler|durable object|workers|R2|BGP|toil|incident|sli|slo|golden signal)\b'),
+
+    # WARM arcs (last post 30-90 days ago)
+    ('cybersecurity-cissp-arc',
+     r'\b(cissp|cybersecurity|hardwarekey|fido|yubikey|encryption|cryptograph|infosec|owasp|stride|cia triad|hashing|steganography)\b'),
+    ('python-systems-concurrency-arc',
+     r'\b(GIL|threading|multiprocessing|subprocess|asyncio|coroutine|concurrency|parallelism|race condition|deadlock|fork|process pool)\b'),
+    ('neurodivergence-adhd-arc',
+     r'\b(adhd|neurodivergen|burnout|executive function|hyperfixate|dopamine|focus mode|deep work)\b'),
+
+    # DORMANT arcs (last post >180 days ago — kept for archaeology)
+    ('quantum-computing-arc',
+     r'\b(quantum|qubit|qiskit|superposition|entanglement|shor)\b'),
+    ('deep-learning-foundations-arc',
+     r'\b(CNN|convolutional|SGD|stochastic gradient|imagenet|resnet|transfer learning|deep learning|neural net|hyperparameter|overfit|underfit|validation set|epoch|loss function|gradient descent)\b'),
+    ('algorithms-leetcode-arc',
+     r'\b(leetcode|hackerrank|dynamic programming|backtracking|prefix sum|big o|binary search|memoization|knapsack|fibonacci|sliding window)\b'),
+    ('nand2tetris-arc',
+     r'\bnand'),
+    ('advent-of-code-arc',
+     r'(advent of code|adventofcode|day \d+|#aoc)'),
 ]
+
+# Killed concepts (no longer matched, prior pages should be deleted):
+# - bell-labs-lineage — Gemini found only ~2 tangential mentions; not a real arc
+# - python-data — misnamed; replaced by python-systems-concurrency
+# - sre-infra + cloudflare — merged into sre-infra-cloudflare (same learning phase)
+KILLED_CONCEPTS = ['bell-labs-lineage', 'python-data-arc', 'sre-infra-arc', 'cloudflare-arc',
+                   'cybersecurity-arc', 'nyc-events-attendance']  # renamed in TOPIC_MATCHERS
 
 CORE_CONCEPTS = [
     ("field-note-format",
@@ -144,10 +180,22 @@ def build_concept(name, definition, matcher, category, details):
     page += "\n<!-- human notes below -->\n"
     return page, len(matches), conf, category
 
+# Cleanup: delete concept pages for killed/renamed concepts
+for killed in KILLED_CONCEPTS:
+    p = CONCEPTS_DIR / f"{killed}.md"
+    if p.exists():
+        p.unlink()
+        print(f"  KILLED  {killed}")
+
 written = 0
 for name, defn, matcher, cat, det in CONCEPTS:
     page, n, conf, category = build_concept(name, defn, matcher, cat, det)
     if cat == "topical-arc" and n == 0:
+        # Also remove stale topical concept pages that no longer match
+        p = CONCEPTS_DIR / f"{name}.md"
+        if p.exists():
+            p.unlink()
+            print(f"  EMPTY   {name} (deleted — no matches)")
         continue
     (CONCEPTS_DIR / f"{name}.md").write_text(page)
     written += 1
