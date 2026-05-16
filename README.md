@@ -15,16 +15,20 @@ feed.html  →  559 tweets fetched  →  KB w/ chunked citations  →  pattern r
 
 ---
 
-## The premise
+## The premise (autobiographical)
 
-Most people on X who think they have "low engagement" actually have **no signal**.
-Their feeds are an archaeology of half-thoughts: 13-word link-forwards, "I just
-learned X" posts, Q: A: flashcards, 75 raw URLs in a row on a bad week. Meanwhile
-their *shares* — what they choose to amplify — reveal a completely different person:
-a builder who reads @garrytan, @charles_irl, @CloudflareDev, @sama; a thinker who
-boosts Bell Labs lore and freedom-tech infra critiques.
+I built revamp-x because of my own feed. **413 original posts in 9 years.
+14 total likes across all of them.** My top-engaged post was a Matt Pocock video forward.
 
-**Two careers in one feed.** revamp-x finds the gap and closes it.
+But when I audited my *shares* — what I quietly boost — the picture was different:
+founder/infra/AI-builder accounts on rotation, technical takes I'd silently file away,
+hardware history I returned to. The diet I was *consuming* and the diet I was *posting*
+were from two different careers.
+
+revamp-x is the substrate that makes that gap visible — and the toolchain that helps
+close it. If you have a similar pattern (you're not the only one), it may work for you
+too. The defaults are tech-skewed because I'm tech-skewed; the matchers in
+`kb.config.json` are overridable.
 
 ---
 

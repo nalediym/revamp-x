@@ -130,7 +130,8 @@ Two scripts in sequence:
    - **Voice concepts:** `field-note-format` (canon), `student-voice-mode`, `link-only-post`, `q-and-a-flashcard`, `youtube-link-share-habit` (anti-patterns)
    - **Network concepts:** `tier1-builder-amplification`, `reply-game-vacuum`
    - **Synthesis concepts:** `consumption-production-gap`
-   - **Topical arcs** (heuristic, customizable in kb.config.json): quantum-computing, cybersecurity, nand2tetris, advent-of-code, sre-infra, cloudflare, ai-retrieval-rag, python-data
+   - **Topical arcs** (heuristic, customizable in kb.config.json): ai-agents-mcp, career-productivity-psychology, ai-generative-art, ai-retrieval-rag, nyc-tech-scene, sre-infra-cloudflare, cybersecurity-cissp, python-systems-concurrency, neurodivergence-adhd, quantum-computing, deep-learning-foundations, algorithms-leetcode, nand2tetris, advent-of-code
+   - **Note on the matchers:** v0.1 used a tech-skewed 8-arc set that captured only ~25% of a tested corpus. The current 14-arc set was rebuilt 2026-05-16 after a Gemini-second-opinion analysis caught the coverage gap. Non-tech users will still want to override via `kb.config.json`.
 2. `python3 scripts/build_index.py kb <handle>` — regenerates `kb/wiki/index.md` and runs lint
 
 **Hallucination guard:** every concept page MUST cite chunk IDs from real source pages.
@@ -218,22 +219,25 @@ inline. Do not modify any skills — audit-only.
 | Skill | How it pairs |
 |---|---|
 | `/knowledge-base` | revamp-x is built on the KB pattern; concept pages follow the chunk-citation iron law |
-| `/pitch-gold` | Phase 7 wraps pitch-gold + an 8th tier-1-builder lens |
-| `/pimp` | Once `pimp` becomes KB-aware, `/revamp-x draft` output can feed directly into its GENERATE phase |
-| `/x-to-skill` | The 34+ abandoned-hashtag concepts surfaced by `diagnose` are skill candidates for x-to-skill |
-| `/naledi-voices` | Should encode the field-note-format voice canon (currently it doesn't) |
+| `/pitch-gold` | Phase 7 wraps pitch-gold's 7 lenses. An 8th lens — "would a tier-1 builder reply to this?" — is recommended but not yet implemented in pitch-gold itself. |
+| `/pimp` | `/pimp` has a Phase 4.5 voice-gate that loads `kb/wiki/concepts/*.md` and the writing canon before approving generated content. `/revamp-x draft` output can feed directly into its GENERATE phase. |
+| `/x-to-skill` | Abandoned-hashtag concepts surfaced by `diagnose` are skill candidates for x-to-skill. (Count varies per corpus.) |
+| `/naledi-voices` | Encodes the field-note-format voice canon as 7 binary rules + voice-load test. Loaded as passive infrastructure by any skill drafting outbound content. |
 | `/curator` | Phase 6 IS a curator-style audit narrowed to "is this skill KB-coherent?" |
 
 ---
 
 ## Known limitations
 
-- **Manual feed export.** No automated way to pull an X feed in 2026. User must export
-  HTML themselves or use a third-party tool.
+- **Manual feed export.** v0.1 uses an HTML export as input (the naledicodes-feed.html format —
+  a list of tweet IDs embedded in a JS variable). Other export paths (Twitter Archive,
+  third-party scrapers) would need a different `scripts/extract_ids.py` adapter.
 - **Syndication endpoint is unauth'd but rate-limited.** Mass-fetching 1000+ tweets
   may trigger throttling; the fetcher retries with exponential backoff.
 - **Topical-arc matchers are tech-skewed defaults.** Non-tech users should override
-  via `kb.config.json` (custom patterns). v2 will infer patterns from corpus instead.
+  via `kb.config.json` (custom patterns). The default set may miss 70%+ of your corpus
+  on first run; a second-opinion analysis (e.g. via Gemini CLI) is recommended to find
+  the gaps. v2 should infer patterns from corpus instead of regex matchers.
 - **Voice canon is opinionated.** "Field note from / Research trail behind" assumes
   the user wants a builder-credibility-shaped voice. Different audiences (e.g. fiction
   writers, creators) need different canon — out of scope for v1.
